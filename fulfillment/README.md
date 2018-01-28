@@ -2,7 +2,7 @@
 
 ## Example Usage
 
-```
+```Go
 package main
 
 import (
@@ -15,6 +15,7 @@ import (
 func main() {
     fs := fulfillment.NewServer()
     fs.Actions.Set("hello", hello)
+    fs.DisableBasicAuth = true
     fs.ListenAndServe()
 }
 

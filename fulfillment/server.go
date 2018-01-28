@@ -357,7 +357,7 @@ func (s *Server) ListenAndServeTLS(certFile, keyFile string) error {
 	return s.Server.ListenAndServeTLS(certFile, keyFile)
 }
 
-// ListenAndServeUntilSignal invokes ListenAndServe and blocks until the one of
+// ListenAndServeUntilSignal invokes ListenAndServe and blocks until one of
 // the given OS signals are called.
 func (s *Server) ListenAndServeUntilSignal(sig ...os.Signal) {
 	go func() {
@@ -381,6 +381,8 @@ func (s *Server) ListenAndServeUntilSignal(sig ...os.Signal) {
 	s.Shutdown()
 }
 
+// ListenAndServeTLSUntilSignal invokes ListenAndServe and blocks until one of
+// the given OS signals are called.
 func (s *Server) ListenAndServeTLSUntilSignal(certFile, keyFile string, sig ...os.Signal) {
 	go func() {
 		if err := s.ListenAndServeTLS(certFile, keyFile); err != nil {
