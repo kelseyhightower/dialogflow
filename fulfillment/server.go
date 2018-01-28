@@ -21,11 +21,11 @@ import (
 	"google.golang.org/api/dialogflow/v2beta1"
 )
 
-// The error returned from ListenAndServe and ListenAndServeTLS when basic
+// ErrEmptyHashedPassword is returned from ListenAndServe and ListenAndServeTLS when basic
 // authentication is required and the hashed password is empty.
 var ErrEmptyHashedPassword = errors.New("dialogflow/fulfillment: basic auth hashed password is empty")
 
-// The error returned from ListenAndServe and ListenAndServeTLS when basic
+// ErrEmptyUsername is returned from ListenAndServe and ListenAndServeTLS when basic
 // authentication is required and the username is empty.
 var ErrEmptyUsername = errors.New("dialogflow/fulfillment: basic auth username is empty")
 
@@ -357,6 +357,8 @@ func (s *Server) ListenAndServeTLS(certFile, keyFile string) error {
 	return s.Server.ListenAndServeTLS(certFile, keyFile)
 }
 
+// ListenAndServeUntilSignal invokes ListenAndServe and blocks until the one of
+// the given OS signals are called.
 func (s *Server) ListenAndServeUntilSignal(sig ...os.Signal) {
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
