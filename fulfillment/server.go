@@ -35,7 +35,7 @@ var DefaultCacheDirectory = "/var/lib/dialogflow/fulfillment"
 
 // An ActionFunc processes an dialogflow.WebhookRequest and returns a
 // dialogflow.WebhookResponse.
-type ActionFunc func(*dialogflow.WebhookRequest) (*dialogflow.WebhookResponse, error)
+type ActionFunc func(*dialogflow.GoogleCloudDialogflowV2WebhookRequest) (*dialogflow.GoogleCloudDialogflowV2WebhookResponse, error)
 
 // An Actions represents the supported actions of a fulfillment server.
 type Actions map[string]ActionFunc
@@ -152,7 +152,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	r.Body.Close()
 
-	var webhookRequest dialogflow.WebhookRequest
+	var webhookRequest dialogflow.GoogleCloudDialogflowV2WebhookRequest
 	err = json.Unmarshal(body, &webhookRequest)
 	if err != nil {
 		log.Println(err)

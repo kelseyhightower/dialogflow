@@ -36,14 +36,14 @@ func main() {
 	}
 }
 
-func hello(q *dialogflow.WebhookRequest) (*dialogflow.WebhookResponse, error) {
+func hello(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest) (*dialogflow.GoogleCloudDialogflowV2WebhookResponse, error) {
 	var parameters helloParameters
 
 	if err := json.Unmarshal(q.QueryResult.Parameters, &parameters); err != nil {
 		return nil, err
 	}
 
-	response := &dialogflow.WebhookResponse{
+	response := &dialogflow.GoogleCloudDialogflowV2WebhookResponse{
 		FulfillmentText: fmt.Sprintf("Hello %s!", parameters.Name),
 	}
 	return response, nil

@@ -7,15 +7,15 @@ package fulfillment_test
 import (
 	"fmt"
 
-	"google.golang.org/api/dialogflow/v2beta1"
 	"github.com/kelseyhightower/dialogflow/fulfillment"
+	"google.golang.org/api/dialogflow/v2beta1"
 )
 
 func Example() {
 	fs := fulfillment.NewServer()
 
 	fs.Actions.Set("hello", func(q *dialogflow.WebhookRequest) (*dialogflow.WebhookResponse, error) {
-		response := &dialogflow.WebhookResponse{
+		response := &dialogflow.Response{
 			Speech: fmt.Sprintf("Hello %s!", q.Result.Parameters["name"]),
 		}
 		return response, nil
