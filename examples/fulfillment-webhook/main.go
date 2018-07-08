@@ -11,7 +11,7 @@ import (
 	"log"
 
 	"github.com/kelseyhightower/dialogflow/fulfillment"
-	"google.golang.org/api/dialogflow/v2beta1"
+	"google.golang.org/api/dialogflow/v2"
 )
 
 var (
