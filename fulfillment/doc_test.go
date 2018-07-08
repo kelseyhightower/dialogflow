@@ -5,18 +5,17 @@
 package fulfillment_test
 
 import (
-	"fmt"
-
 	"github.com/kelseyhightower/dialogflow/fulfillment"
-	"google.golang.org/api/dialogflow/v2beta1"
+	"google.golang.org/api/dialogflow/v2"
 )
 
 func Example() {
 	fs := fulfillment.NewServer()
+	fs.DisableBasicAuth = true
 
-	fs.Actions.Set("hello", func(q *dialogflow.WebhookRequest) (*dialogflow.WebhookResponse, error) {
-		response := &dialogflow.Response{
-			Speech: fmt.Sprintf("Hello %s!", q.Result.Parameters["name"]),
+	fs.Actions.Set("helloworld", func(q *dialogflow.GoogleCloudDialogflowV2WebhookRequest) (*dialogflow.GoogleCloudDialogflowV2WebhookResponse, error) {
+		response := &dialogflow.GoogleCloudDialogflowV2WebhookResponse{
+			FulfillmentText: "Hello World!",
 		}
 		return response, nil
 	})
