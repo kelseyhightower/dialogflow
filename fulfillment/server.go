@@ -102,9 +102,6 @@ type Server struct {
 	// must be set and non-empty. Defaults to false.
 	DisableBasicAuth bool
 
-	// HealthServer holds the health server.
-	HealthServer *http.Server
-
 	autocertManager  *autocert.Manager
 	status           int
 	basicAuthEnabled bool
@@ -121,11 +118,8 @@ func NewServer() *Server {
 
 	fulfillment := http.NewServeMux()
 	fulfillment.Handle("/", Handler(s.Actions))
+	fulfillment.HandleFunc("/healthz", s.healthHandler)
 	s.Server = &http.Server{Handler: fulfillment}
-
-	health := http.NewServeMux()
-	health.HandleFunc("/healthz", s.healthHandler)
-	s.HealthServer = &http.Server{Handler: health}
 
 	return s
 }
@@ -223,10 +217,9 @@ func basicAuthHandler(username, hashedPassword string, h http.Handler) http.Hand
 }
 
 // ListenAndServe listens on TCP address s.Addr to handle Dialogflow
-// fulfillment requests, s.HealthServer.Addr to handle health checks.
+// fulfillment requests.
 //
 // If s.Addr is blank, "0.0.0.0:80" is used.
-// If s.HealthServer.Addr is blank, "0.0.0.0:8080" is used.
 //
 // ListenAndServe always returns a non-nil error.
 func (s *Server) ListenAndServe() error {
@@ -245,19 +238,6 @@ func (s *Server) ListenAndServe() error {
 	if s.Server.Addr == "" {
 		s.Server.Addr = "0.0.0.0:80"
 	}
-	if s.HealthServer.Addr == "" {
-		s.HealthServer.Addr = "0.0.0.0:8080"
-	}
-
-	// Start the health server.
-	go func() {
-		if err := s.HealthServer.ListenAndServe(); err != nil {
-			if err == http.ErrServerClosed {
-				return
-			}
-			log.Println(err)
-		}
-	}()
 
 	s.SetStatus(http.StatusOK)
 
@@ -265,10 +245,9 @@ func (s *Server) ListenAndServe() error {
 }
 
 // ListenAndServeTLS listens on TCP address s.Addr to handle Dialogflow
-// fulfillment requests, and s.HealthServer.Addr to handle health checks.
+// fulfillment requests.
 //
 // If s.Addr is blank, "0.0.0.0:443" is used.
-// If s.HealthServer.Addr is blank, "0.0.0.0:8080" is used.
 // If s.ACMEHTTPChallengeServer.Addr is blank, "0.0.0.0:80" is used.
 //
 // If s.Domain is not blank, Let's Encrypt is enabled automatically for the
@@ -297,9 +276,6 @@ func (s *Server) ListenAndServeTLS(certFile, keyFile string) error {
 
 	if s.Server.Addr == "" {
 		s.Server.Addr = "0.0.0.0:443"
-	}
-	if s.HealthServer.Addr == "" {
-		s.HealthServer.Addr = "0.0.0.0:8080"
 	}
 	if s.ACMEHTTPChallengeServer.Addr == "" {
 		s.ACMEHTTPChallengeServer.Addr = "0.0.0.0:80"
@@ -343,16 +319,6 @@ func (s *Server) ListenAndServeTLS(certFile, keyFile string) error {
 			}
 		}()
 	}
-
-	// Start the health server.
-	go func() {
-		if err := s.HealthServer.ListenAndServe(); err != nil {
-			if err == http.ErrServerClosed {
-				return
-			}
-			log.Println(err)
-		}
-	}()
 
 	return s.Server.ListenAndServeTLS(certFile, keyFile)
 }
@@ -417,12 +383,9 @@ func (s *Server) SetStatus(status int) {
 
 // Shutdown gracefully shuts down the fulfillment server.
 //
-// Shutdown works by calling Shutdown on the fulfillment, health, and acme HTTP
+// Shutdown works by calling Shutdown on the fulfillment and acme HTTP
 // challenge servers managed by the Server.
 func (s *Server) Shutdown() {
-	if err := s.HealthServer.Shutdown(context.Background()); err != nil {
-		log.Println(err)
-	}
 	if err := s.Server.Shutdown(context.Background()); err != nil {
 		log.Println(err)
 	}
