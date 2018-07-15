@@ -124,7 +124,7 @@ func NewServer() *Server {
 	s.Server = &http.Server{Handler: fulfillment}
 
 	health := http.NewServeMux()
-	health.HandleFunc("/health", s.healthHandler)
+	health.HandleFunc("/healthz", s.healthHandler)
 	s.HealthServer = &http.Server{Handler: health}
 
 	return s
